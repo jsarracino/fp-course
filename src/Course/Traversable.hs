@@ -19,7 +19,7 @@ import Course.Compose
 --   `∀f g. f . traverse g ≅ traverse (f . g)`
 --
 -- * The law of identity
---   `∀x. traverse ExactlyOne x ≅ ExactlyOne x`
+--   `∀x. traverse pure x ≅ pure x`
 --
 -- * The law of composition
 --   `∀f g. traverse ((g <$>) . f) ≅ (traverse g <$>) . traverse f`
@@ -45,8 +45,8 @@ instance Traversable ExactlyOne where
     (a -> f b)
     -> ExactlyOne a
     -> f (ExactlyOne b)
-  traverse =
-    error "todo: Course.Traversable traverse#instance ExactlyOne"
+  traverse f (ExactlyOne x) =
+    ExactlyOne <$> f x
 
 instance Traversable Optional where
   traverse ::
@@ -54,8 +54,8 @@ instance Traversable Optional where
     (a -> f b)
     -> Optional a
     -> f (Optional b)
-  traverse =
-    error "todo: Course.Traversable traverse#instance Optional"
+  traverse f (Full x) = Full <$> f x
+  traverse _ Empty = pure Empty
 
 -- | Sequences a traversable value of structures to a structure of a traversable value.
 --
@@ -71,8 +71,8 @@ sequenceA ::
   (Applicative f, Traversable t) =>
   t (f a)
   -> f (t a)
-sequenceA =
-  error "todo: Course.Traversable#sequenceA"
+sequenceA = traverse id
+  
 
 instance (Traversable f, Traversable g) =>
   Traversable (Compose f g) where
